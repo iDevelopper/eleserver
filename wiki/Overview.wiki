@@ -28,3 +28,8 @@ so you have to paste the GPX file into a text area...
   * http://maps.webhop.net:1281?lat=XXXX&lon=YYYY - returns a single value, which is the elevation of the particular point in metres above sea level.
   * POST a GPX file (tagged as 'GPXFile' to http://maps.webhop.net:1281 - it returns a list of the route points in the file, with elevations.
   * It also tries to plot route profiles, but I can't remember how - will have to read the code...
+
+=Links=
+  * See CodeStructure for details of the structure of the code.
+  * Get SRTM Data from http://srtm.csi.cgiar.org
+  * An alternative to EleServer is http://wiki.openstreetmap.org/index.php/Route_altitude_profiles_SRTM

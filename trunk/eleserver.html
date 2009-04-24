@@ -1,0 +1,80 @@
+<html>
+<head>
+<title>EleServer - Ground Elevation Server</title>
+</head>
+<body>
+<h1>EleServer Ground Elevation Server</h1>
+<h2>About EleServer</h2>
+<p>EleServer is a simple web application to provide data on ground elevation
+above sea level.  It uses Shuttle Radio Topograpy Mission (SRTM) data obtained
+from <a href="http://srtm.csi.cgiar.org/">http://srtm.csi.cgiar.org/</a>.</p>
+<p>Eleserver can be used in two ways:
+<ol><li>the simplest way is to use a
+HTTP GET request, providing lat and lon as parameters, and eleserver
+retrns the height of the point in metres above sea level.</li>
+<li>The second way is to use a HTTP POST request to send a GPX file to the
+server.  The GPX file should contain a route (ie not a track log).
+The server will list the points in the route, with their altitudes.</li>
+</ol>
+The next development is to sort out the interface a bit better so that
+eleserver can easily be called from JavaScript, so I can interface it
+with my GPX route editor at 
+<a href=http://maps.webhop.net>http://maps.webhop.net</a>.  
+Note that the route
+editor needs some work too - in particular it uses the MultiMap API and I
+want to change it to OpenLayers.  Local file acces in JavaScript is also messy,
+so you have to paste the GPX file into a text area...</p>
+
+<h2>Usage</h2>
+<p><ul>
+<li>http://maps.webhop.net:1281 - returns this page.</li>
+<li>http://maps.webhop.net:1281?lat=XXXX&lon=YYYY - returns a single value, which is the elevation of the particular point in metres above sea level.</li>
+<li>POST a GPX file (tagged as 'GPXFile' to http://maps.webhop.net:1281 - it
+returns a list of the route points in the file, with elevations.</li>
+</ul>
+</p>
+<h2>Example 1 - Single Point</h2>
+<form method="get">
+Lat:<input type="text" name="lat"><br>
+Lon:<input type="text" name="lon"><input type="submit" value="Submit">
+</form>
+<h2>Example 2 - GPX File</h2>
+<form method="post" enctype='multipart/form-data'>
+Paste GPX File Here:
+<textarea rows="6" cols="100" name="GPXFile">
+   Paste GPX File Here.
+</textarea>
+<input type="checkbox" name="Plot">
+<input type="submit" value="Submit">
+
+<h2>How It Works</h2>
+<p>There are three main classes used in eleserver.  He main eleserver class
+is a pure python based http server using the BaseHTTPServer class that
+comes with python.  This handles HTTP requests on a specified port.
+I do not use the standard port 80 so that you can use a normal
+web server such as apache as well.  The current version of the code will
+handle get requests as shown in the examples.  The intention is to add POST
+data handling which will take a GPX file, and return the file with elevation
+data filled in.</p>
+<p>The business bit is the class srtm_tiff.  This reads a file srtm_tiff.txt
+which is a list of filenames to read.  The files should be GeoTIFF files
+containing SRTM height data, as can be obtained from <a href="http://srtm.csi.cgiar.org">http://srtm.csi.cgiar.org</a>.  This data is 0.5deg tiles, so you 
+can cover the whole uk in 5 tiles, which limis the number of files to handle.</p>
+<p>All of the specified files are read into memory and stored in an array 
+tilearr[].  The method getElevation(lat,lon) returns the elevation of the
+specified location.  It returns -999 if the location is not covered by any
+of the data files.  Actually, it returns the elevation of a data point close to
+the specified one - a future extention is to interpolate....
+</p>
+<p>The reading of the GPX files is done in the gpx_parse.py module, that uses
+the python minidom module to parse the XML file.</p>
+<p>The python code and data file is:
+<ul><li><a href="eleserver.py">eleserver.py</a></li>
+    <li><a href="srtm_tiff.py">srtm_tiff.py</a></li>
+    <li><a href="gpx_parse.py">gpx_parse.py</a></li>
+    <li><a href="srtm_tiff.txt">srtm_tiff.txt</a></li>
+</ul>
+<h2>Contact</h2>
+<p>GrahamJones 'at' physics.org for help/info.</p>
+<body>
+</html>

@@ -43,12 +43,11 @@ def srtm_tilegen(options):
             colval = int(255.0*ele/500.0)
             #print "px=(%d,%d), latlon=(%f,%f), ele=%f, colval=%d" % \
             #    (px_x,px_y,px_latlon[0],px_latlon[1],ele,colval)
-
-#            im.setPixel((px_x,px_y),im.colorAllocate((colval,colval,colval)))
-            if (ele<200.):
-                im.setPixel((px_x,px_y),white)
-            else:
-                im.setPixel((px_x,px_y),black)
+            im.setPixel((px_x,px_y),im.colorResolve((colval,colval,colval)))
+            #if (ele<200.):
+            #    im.setPixel((px_x,px_y),white)
+            #else:
+            #    im.setPixel((px_x,px_y),black)
 
     f=open("xx.png","w")
     im.writePng(f)

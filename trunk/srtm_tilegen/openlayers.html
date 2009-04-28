@@ -1,35 +1,24 @@
 <html>
 <head>
-    <title>OpenStreetMap</title>
+    <title>Graham's SRTM Images</title>
  
-    <!-- bring in the OpenLayers javascript library
-         (here we bring it from the remote site, but you could
-         easily serve up this javascript yourself) -->
     <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
- 
-    <!-- bring in the OpenStreetMap OpenLayers layers.
-         Using this hosted file will make sure we are kept up
-         to date with any necessary changes -->
     <script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>
  
     <script type="text/javascript">
-        // Start position for the map (hardcoded here for simplicity,
-        // but maybe you want to get from URL params)
-        // (Though to get it from the URL it's simpler to use the Permalink and ArgParser controls)
-        var lat=54.5
-        var lon=-1.10
-        var zoom=8
+      var lat=54.5
+      var lon=-1.10
+      var zoom=7
  
-        var map; //complex object of type OpenLayers.Map
+      var map; //complex object of type OpenLayers.Map
  
-        //Initialise the 'map' object
-        function init() {
- 
-            map = new OpenLayers.Map ("map", {
-                controls:[
+      //Initialise the 'map' object
+      function init() {
+          map = new OpenLayers.Map ("map", {
+          controls:[
                     new OpenLayers.Control.Navigation(),
                     new OpenLayers.Control.PanZoomBar(),
-                    new OpenLayers.Control.Attribution()],
+                    ],
                 maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
                 maxResolution: 156543.0399,
                 numZoomLevels: 19,
@@ -39,18 +28,14 @@
             } );
  
  
-            // Define the map layer
-            // Note that we use a predefined layer that will be
-            // kept up to date with URL changes
-            // Here we define just one layer, but providing a choice
-            // of several layers is also quite simple
-            // Other defined layers are OpenLayers.Layer.OSM.Mapnik, OpenLayers.Layer.OSM.Maplint and OpenLayers.Layer.OSM.CycleMap
-            layerTilesAtHome = new OpenLayers.Layer.OSM.Osmarender("Osmarender",{transparent: 'true'});
-	    layerTilesAtHome.setOpacity(0.5);
-            map.addLayer(layerTilesAtHome);
-	    var newLayer = new OpenLayers.Layer.OSM("SRTM", "file:///home/disk2/OSM/eleserver/srtm_tilegen/tiles/", {numZoomLevels: 17, transparent: 'true', isBaseLayer: 'false'});
-	    newLayer.setOpacity(0.5);
+//	    var newLayer = new OpenLayers.Layer.OSM("SRTM", "file:///home/disk2/OSM/eleserver/srtm_tilegen/tiles/", {numZoomLevels: 17, transparent: 'true', isBaseLayer: false, opacity: 0.5});
+	    var newLayer = new OpenLayers.Layer.OSM("SRTM", "http://maps.webhop.net/srtm", {numZoomLevels: 17, transparent: 'true', isBaseLayer: false, opacity: 0.5});
 	    map.addLayer(newLayer);
+
+            layerTilesAtHome = new OpenLayers.Layer.OSM.Osmarender("Osmarender",{transparent: 'false', isBaseLayer: 'true', opacity: 1});
+//	    layerTilesAtHome.setOpacity(0.5);
+            map.addLayer(layerTilesAtHome);
+
  
 	    map.addControl(new OpenLayers.Control.LayerSwitcher());
             if( ! map.getCenter() ){

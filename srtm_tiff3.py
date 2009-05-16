@@ -217,12 +217,17 @@ class srtm_tiff:
             else:
                 if (self.debug):
                     print "File already open - NumOpenFiles = %s" % self.NumOpenFiles
-            (row,col) = self.posFromLatLon(lat,lon, td)
+            (row,col,row_f,col_f) = self.posFromLatLon(lat,lon, td)
             if (self.verbose):
-                print "row=%s, col=%s" % (row,col)
+                print "row=%s, col=%s,row_f=%s,col_f=%s" % (row,col,row_f,col_f)
             if (bilinear):
                 if (self.debug):
                     print "Using bilinear interpolation to find height"
+                    # NOTE - THIS IS A FIDDLE TO STOP ERRORS AT THE EDGE OF
+                    # TILES - IT IS NO CORRECT - WE SHOULD GET TWO POINTS 
+                    # FROM THE NEXT TILE.
+                if row==5999: row=5998
+                if col==5999: col=5998
                 htarr=gdalnumeric.DatasetReadAsArray(td['handle'],col,row,2,2)
                 if (self.debug):
                     print htarr
@@ -230,7 +235,7 @@ class srtm_tiff:
                                                htarr[0][1],
                                                htarr[1][0],
                                                htarr[1][1],
-                                               lat, lon)
+                                               row_f-row,col_f-col)
             else:
                 if (self.debug):
                     print "Using single point to get height"
@@ -259,8 +264,10 @@ class srtm_tiff:
         xsize = td["xsize"]
         ysize = td["ysize"]
         
-        rowno = int(floor((lat-N)/lat_pixel))
-        colno = int(floor((lon-W)/lon_pixel))
+        rowno_f = (lat-N)/lat_pixel
+        colno_f = (lon-W)/lon_pixel
+        rowno = int(floor(rowno_f))
+        colno = int(floor(colno_f))
 
         # Error checking to correct any rounding errors.
         if (rowno<0):
@@ -272,7 +279,7 @@ class srtm_tiff:
         if (colno>(ysize-1)):
             colno = xsize-1
             
-        return (rowno,colno)
+        return (rowno,colno,rowno_f,colno_f)
 
 def bilinearInterpolation(tl, tr, bl, br, a, b):
   # GJ Shamelessly plagiarised from route_altitude_profile/trunk/server/altitude.py
@@ -375,6 +382,8 @@ if __name__ == '__main__':
                       help="Run a series of self tests")
     parser.add_option("--bigtest",dest="bigtest",
                       help="Run the specified number of test cases to check speed")
+    parser.add_option("--profile",action="store_true", dest="profile",
+                      help="Do a large number of elevation calculations to see how quick (or slow) it is.")
     parser.add_option("-v", "--verbose", action="store_true",dest="verbose",
                       help="Include verbose output")
     parser.add_option("-d", "--debug", action="store_true",dest="debug",
@@ -386,6 +395,7 @@ if __name__ == '__main__':
                         bilinear=False,
                         test=False,
                         bigtest=0,
+                        profile=False,
                         debug=False,
                         verbose=False)
     (options,args)=parser.parse_args()
@@ -454,3 +464,15 @@ if __name__ == '__main__':
                     timePerTest = total_ms / numtests
                     print "Total time = %s ms" % (total_ms)
                     print "Time per elevation measurement = %s ms" % timePerTest
+
+
+        if options.profile:
+            print "Profiling..."
+            testvalue = 10000000
+            for i in range(testvalue):
+                f = float(i)/testvalue
+                #tile.getAltitudeFromLatLon(49.0+f, 11.0+f)
+                ele = srtm.getElevation(49.0+f,11.0+f,options.bilinear)
+
+
+    

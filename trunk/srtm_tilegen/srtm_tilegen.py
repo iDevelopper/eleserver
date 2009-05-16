@@ -3,7 +3,7 @@
 
 from optparse import OptionParser
 from tilenames import *
-from srtm_tiff import srtm_tiff
+from srtm_tiff3 import srtm_tiff
 import gd
 import os
 
@@ -45,7 +45,7 @@ def rendertile(options,srtm,tile_X,tile_Y,Z):
                 px_X = tile_X + px_x/256.
                 px_Y = tile_Y + px_y/256.
                 px_latlon = xy2latlon(px_X,px_Y,Z)
-                ele = srtm.getElevation(px_latlon[0],px_latlon[1])
+                ele = srtm.getElevation(px_latlon[0],px_latlon[1],True)
                 eleArr[px_x][px_y] = ele
                 if ele<0: eleArr[px_x][px_y]=0.0
 
@@ -89,7 +89,7 @@ def srtm_tilegen(options):
     tile_Y = int(options.y)
     Z = int(options.z)
 
-    srtm = srtm_tiff()
+    srtm = srtm_tiff("srtm_tiff.txt",10,options.verbose,options.debug)
 
     rendertile(options,srtm,tile_X,tile_Y,Z)
 

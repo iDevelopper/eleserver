@@ -1,0 +1,1 @@
+Eleserver provides a simple API to allow users to request the altitude of a specific lat,long point on earth.  It uses SRTM elevation data to provide the information.
